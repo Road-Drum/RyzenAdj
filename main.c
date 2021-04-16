@@ -39,7 +39,7 @@ do {                                                                            
 		int adjerr = set_##ARG(ry);                                               \
 		if (!adjerr){                                                             \
 			any_adjust_applied = 1;                                               \
-			printf("Sucessfully enable " STRINGIFY(ARG) );                        \
+			printf("Sucessfully enable " STRINGIFY(ARG) " \n");                   \
 		} else if (adjerr == ADJ_ERR_FAM_UNSUPPORTED) {                           \
 			printf("set_" STRINGIFY(ARG) " is not supported on this family\n");   \
 			err = -1;                                                             \
@@ -87,7 +87,7 @@ static void show_info_header(ryzen_access ry)
 
 static void show_info_table(ryzen_access ry)
 {
-	printf("PM Table Version: %x\n", get_table_ver(ry));
+	printf("PM Table Version: %x\n\n", get_table_ver(ry));
 
 	//get refresh table after adjust
 	int errorcode = refresh_table(ry);
@@ -97,8 +97,9 @@ static void show_info_table(ryzen_access ry)
 	}
 
 	//print table in github markdown
-	printf("|       Name       |   Value   |      Paramter      |\n");
-	printf("|------------------|-----------|--------------------|\n");
+	printf("+------------------+-----------+--------------------+\n");
+	printf("|       Name       |   Value   |     Parameter      |\n");
+	printf("+------------------+-----------+--------------------+\n");
 	char tableFormat[] = "| %-16s | %9.3lf | %-18s |\n";
 	printf(tableFormat, "STAPM LIMIT", get_stapm_limit(ry), "stapm-limit");
 	printf(tableFormat, "STAPM VALUE", get_stapm_value(ry), "");
@@ -124,6 +125,7 @@ static void show_info_table(ryzen_access ry)
 	printf(tableFormat, "STT VALUE APU", get_apu_skin_temp_value(ry), "");
 	printf(tableFormat, "STT LIMIT dGPU", get_dgpu_skin_temp_limit(ry), "dgpu-skin-temp");
 	printf(tableFormat, "STT VALUE dGPU", get_dgpu_skin_temp_value(ry), "");
+	printf("+------------------+-----------+--------------------+\n");
 }
 
 static void show_table_dump(ryzen_access ry, int any_adjust_applied)
@@ -151,26 +153,30 @@ static void show_table_dump(ryzen_access ry, int any_adjust_applied)
 		}
 
 		//print table in github markdown
+		printf("+--------+------------+-----------+--------------+\n");
 		printf("| Offset |    Data    |   Value   | After Adjust |\n");
-		printf("|--------|------------|-----------|--------------|\n");
+		printf("+--------+------------+-----------+--------------+\n");
 		char tableFormat[] = "| 0x%04X | 0x%08X | %9.3lf | %12.3lf |\n";
 		for(index = 0; index < table_size / 4; index++)
 		{
 			printf(tableFormat, index * 4, table_data_copy[index], old_table_values[index], current_table_values[index]);
 		}
+		printf("+--------+------------+-----------+--------------+\n");
 
 		free(old_table_values);
 	}
 	else
 	{
 		//print table in github markdown
+		printf("+--------+------------+-----------+\n");
 		printf("| Offset |    Data    |   Value   |\n");
-		printf("|--------|------------|-----------|\n");
+		printf("+--------+------------+-----------+\n");
 		char tableFormat[] = "| 0x%04X | 0x%08X | %9.3lf |\n";
 		for(index = 0; index < table_size / 4; index++)
 		{
 			printf(tableFormat, index * 4, table_data_copy[index], current_table_values[index]);
 		}
+		printf("+--------+------------+-----------+\n");
 	}
 
 	free(table_data_copy);
